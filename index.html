@@ -37,7 +37,7 @@
   <div id="rotate"><div class="phone"></div>Gire o celular para jogar</div>
   <script>
     // Build id is stamped by BuildScript.BuildWebGL; version.json on the server holds the latest one.
-    const BUILD_ID = "20261118-185745";
+    const BUILD_ID = "20261118-193625";
     document.getElementById("ver").textContent = "v " + BUILD_ID;
 
     // ---- auto-update: whenever the app is opened or comes back to the foreground, ask the server
@@ -73,9 +73,9 @@
     const buildUrl = "Build";
     const config = {
       arguments: [],
-      dataUrl: buildUrl + "/23cce86ef7b4edfafb9cc2543d0da3a1.data",
+      dataUrl: buildUrl + "/6ebe32c2c45f9f1b60fb6c81fd3fc9f6.data",
       frameworkUrl: buildUrl + "/3bb2cdce177e367e5877ecad8cf4462e.framework.js",
-      codeUrl: buildUrl + "/97365d0a20c803b73be1bf9bdf5419f4.wasm",
+      codeUrl: buildUrl + "/6cb3d379a4820319fad8b12ea9a40f73.wasm",
       streamingAssetsUrl: "StreamingAssets",
       companyName: "BG Coding",
       productName: "Hollowgate Arena",
@@ -83,7 +83,7 @@
       devicePixelRatio: Math.min(window.devicePixelRatio || 1, 2),
     };
     const script = document.createElement("script");
-    script.src = buildUrl + "/dd019a12d7319a357b6d7ebbe9ecebf5.loader.js";
+    script.src = buildUrl + "/9a5c3e67bd6564906bdcf5b99cec7e65.loader.js";
     script.onload = () => {
       createUnityInstance(canvas, config, (p) => {
         document.getElementById("fill").style.width = (p * 100) + "%";
