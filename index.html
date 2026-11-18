@@ -21,6 +21,12 @@
     #loading img { width: 120px; height: 120px; border-radius: 28px; }
     #bar { width: 200px; height: 8px; border-radius: 4px; background: #2e3850; overflow: hidden; }
     #fill { width: 0; height: 100%; background: #35d0e0; transition: width .2s; }
+    /* landscape game: ask to turn the phone when it is held upright */
+    #rotate { display: none; position: fixed; inset: 0; z-index: 10; background: #1b2233; color: #e8ecf5;
+              font: 700 20px system-ui, sans-serif; flex-direction: column; align-items: center; justify-content: center; gap: 16px; text-align: center; }
+    #rotate .phone { width: 46px; height: 80px; border: 4px solid #35d0e0; border-radius: 10px; animation: turn 1.6s ease-in-out infinite; }
+    @keyframes turn { 0%, 30% { transform: rotate(0deg); } 60%, 100% { transform: rotate(-90deg); } }
+    @media (orientation: portrait) and (max-width: 900px) { #rotate { display: flex; } }
     #ver { position: fixed; left: 8px; bottom: calc(6px + env(safe-area-inset-bottom)); color: #ffffff55; font: 11px system-ui; pointer-events: none; }
   </style>
 </head>
@@ -28,9 +34,10 @@
   <canvas id="unity-canvas" tabindex="-1"></canvas>
   <div id="loading"><img src="icon-192.png" alt=""><div id="bar"><div id="fill"></div></div><div id="msg">Carregando…</div></div>
   <div id="ver"></div>
+  <div id="rotate"><div class="phone"></div>Gire o celular para jogar</div>
   <script>
     // Build id is stamped by BuildScript.BuildWebGL; version.json on the server holds the latest one.
-    const BUILD_ID = "20261118-171210";
+    const BUILD_ID = "20261118-171727";
     document.getElementById("ver").textContent = "v " + BUILD_ID;
 
     // ---- auto-update: whenever the app is opened or comes back to the foreground, ask the server
@@ -66,9 +73,9 @@
     const buildUrl = "Build";
     const config = {
       arguments: [],
-      dataUrl: buildUrl + "/d1369bc014f8b3b1c06bdc2c7840d797.data",
+      dataUrl: buildUrl + "/da5b7ce5657f2884631286b586b0e566.data",
       frameworkUrl: buildUrl + "/3bb2cdce177e367e5877ecad8cf4462e.framework.js",
-      codeUrl: buildUrl + "/fce107bcb82a411570a18bb95135d1e6.wasm",
+      codeUrl: buildUrl + "/10baf12e2f9cb7db8debc26ebc156f10.wasm",
       streamingAssetsUrl: "StreamingAssets",
       companyName: "BG Coding",
       productName: "Hollowgate Arena",
@@ -76,7 +83,7 @@
       devicePixelRatio: Math.min(window.devicePixelRatio || 1, 2),
     };
     const script = document.createElement("script");
-    script.src = buildUrl + "/db9b906b49e42249b87ea66c06420b9d.loader.js";
+    script.src = buildUrl + "/90044bd9de762ec8c553e3e597bbb458.loader.js";
     script.onload = () => {
       createUnityInstance(canvas, config, (p) => {
         document.getElementById("fill").style.width = (p * 100) + "%";
