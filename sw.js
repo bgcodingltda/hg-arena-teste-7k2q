@@ -1,7 +1,7 @@
 // Network-first service worker: always tries the server so a new build shows up on the next
 // open; falls back to the cache only when offline. Build files have hashed names, so old and
 // new builds never collide. Old caches are dropped when a new worker activates.
-const CACHE = "hollowgate-20261118-170352";
+const CACHE = "hollowgate-20261118-171210";
 
 self.addEventListener("install", () => self.skipWaiting());
 
@@ -16,6 +16,7 @@ self.addEventListener("fetch", (event) => {
   const req = event.request;
   if (req.method !== "GET" || new URL(req.url).origin !== self.location.origin) return;
   if (req.url.includes("version.json")) return;          // always straight from the network
+  if (req.url.includes("/Build/")) return;               // game binaries: leave them to the browser (Safari streams the wasm)
   event.respondWith((async () => {
     try {
       const res = await fetch(req, { cache: "no-cache" });
