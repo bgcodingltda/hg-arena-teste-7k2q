@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, user-scalable=no, shrink-to-fit=yes, viewport-fit=cover">
+  <title>Hollowgate Arena</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icon-192.png">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
+  <meta name="theme-color" content="#1b2233">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Hollowgate">
+  <style>
+    html, body { margin: 0; height: 100%; background: #1b2233; overflow: hidden; touch-action: none;
+                 -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
+    #unity-canvas { position: fixed; inset: 0; width: 100vw; height: 100dvh; display: block; background: #1b2233; }
+    #loading { position: fixed; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center;
+               gap: 18px; color: #e8ecf5; font: 600 16px system-ui, sans-serif; }
+    #loading img { width: 120px; height: 120px; border-radius: 28px; }
+    #bar { width: 200px; height: 8px; border-radius: 4px; background: #2e3850; overflow: hidden; }
+    #fill { width: 0; height: 100%; background: #35d0e0; transition: width .2s; }
+    #ver { position: fixed; left: 8px; bottom: calc(6px + env(safe-area-inset-bottom)); color: #ffffff55; font: 11px system-ui; pointer-events: none; }
+  </style>
+</head>
+<body>
+  <canvas id="unity-canvas" tabindex="-1"></canvas>
+  <div id="loading"><img src="icon-192.png" alt=""><div id="bar"><div id="fill"></div></div><div id="msg">Carregando…</div></div>
+  <div id="ver"></div>
+  <script>
+    // Build id is stamped by BuildScript.BuildWebGL; version.json on the server holds the latest one.
+    const BUILD_ID = "20261118-145134";
+    document.getElementById("ver").textContent = "v " + BUILD_ID;
+
+    // ---- auto-update: whenever the app is opened or comes back to the foreground, ask the server
+    // which build is current; if it is newer than this page, reload (the service worker is
+    // network-first, so the reload gets the new files). No reinstall needed.
+    async function checkForUpdate() {
+      try {
+        const r = await fetch("version.json?t=" + Date.now(), { cache: "no-store" });
+        if (!r.ok) return;
+        const v = await r.json();
+        if (v.build && v.build !== BUILD_ID) {
+          // the CDN may still hand out the old page for a few minutes: try each new build at
+          // most once per 20 s so this can never become a reload loop
+          const key = "hg-reload-" + v.build, last = +(sessionStorage.getItem(key) || 0);
+          if (Date.now() - last < 20000) return;
+          sessionStorage.setItem(key, Date.now());
+          document.getElementById("msg").textContent = "Atualizando…";
+          location.replace("./?v=" + encodeURIComponent(v.build));   // query busts the CDN copy of the page
+        }
+      } catch (e) { /* offline: keep playing the cached build */ }
+    }
+    document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") checkForUpdate(); });
+    window.addEventListener("focus", checkForUpdate);
+    setInterval(checkForUpdate, 60000);
+    checkForUpdate();
+
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker.register("sw.js?b=" + BUILD_ID).catch(() => {});
+    }
+
+    // ---- Unity loader
+    const canvas = document.getElementById("unity-canvas");
+    const buildUrl = "Build";
+    const config = {
+      arguments: [],
+      dataUrl: buildUrl + "/909eb608cb1e155f1b06df9b1a21e665.data.unityweb",
+      frameworkUrl: buildUrl + "/0955fc017e14205cb3944d29ad44eadf.framework.js.unityweb",
+      codeUrl: buildUrl + "/dc72c23594570209e27333562d515b62.wasm.unityweb",
+      streamingAssetsUrl: "StreamingAssets",
+      companyName: "BG Coding",
+      productName: "Hollowgate Arena",
+      productVersion: "1.0",
+      devicePixelRatio: Math.min(window.devicePixelRatio || 1, 2),
+    };
+    const script = document.createElement("script");
+    script.src = buildUrl + "/6f4926207d3f0d0a74025ea6e00bf050.loader.js";
+    script.onload = () => {
+      createUnityInstance(canvas, config, (p) => {
+        document.getElementById("fill").style.width = (p * 100) + "%";
+      }).then(() => {
+        document.getElementById("loading").style.display = "none";
+      }).catch((message) => {
+        document.getElementById("msg").textContent = "Erro: " + message;
+      });
+    };
+    document.body.appendChild(script);
+  </script>
+</body>
+</html>
