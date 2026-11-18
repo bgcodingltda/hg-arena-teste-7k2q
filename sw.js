@@ -1,7 +1,7 @@
 // Network-first service worker: always tries the server so a new build shows up on the next
 // open; falls back to the cache only when offline. Build files have hashed names, so old and
 // new builds never collide. Old caches are dropped when a new worker activates.
-const CACHE = "hollowgate-20261118-204249";
+const CACHE = "hollowgate-20261118-205115";
 
 self.addEventListener("install", () => self.skipWaiting());
 
